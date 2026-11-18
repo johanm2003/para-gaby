@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Playfair+Display:ital,wght@0,600;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
   <style>
     * {
       box-sizing: border-box;
@@ -17,7 +16,6 @@
       user-select: none;
       -webkit-user-select: none;
     }
-
     body, html {
       width: 100%;
       height: 100%;
@@ -26,8 +24,6 @@
       color: #ffffff;
       font-family: 'Playfair Display', Georgia, serif;
     }
-
-    /* Cosmic Breathing Nebula Layer */
     .cosmic-bg {
       position: absolute;
       top: 0;
@@ -42,7 +38,6 @@
         radial-gradient(circle at 80% 20%, rgba(255, 120, 180, 0.05) 0%, transparent 50%);
       animation: auroraBreathe 14s ease-in-out infinite alternate;
     }
-
     @keyframes auroraBreathe {
       0% {
         transform: scale(1.0);
@@ -57,8 +52,6 @@
         opacity: 0.85;
       }
     }
-
-    /* Main 3D Canvas with Bloom Glow Filter */
     #webgl-canvas {
       position: absolute;
       top: 50%;
@@ -67,8 +60,6 @@
       filter: drop-shadow(0 0 6px rgba(255, 122, 182, 0.85)) drop-shadow(0 0 24px rgba(255, 122, 182, 0.45));
       z-index: 2;
     }
-
-    /* Top Dedication Header */
     .header-bar {
       position: absolute;
       top: 32px;
@@ -83,7 +74,6 @@
       text-align: center;
       padding: 0 24px;
     }
-
     .dedication-tag {
       font-family: 'Cormorant Garamond', serif;
       font-size: 13px;
@@ -94,7 +84,6 @@
       margin-bottom: 6px;
       animation: shimmerText 6s ease-in-out infinite alternate;
     }
-
     .dedication-title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.8rem, 5vw, 2.9rem);
@@ -108,7 +97,6 @@
       margin-bottom: 6px;
       animation: pulseTitle 8s ease-in-out infinite alternate;
     }
-
     .dedication-subtitle {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
@@ -119,7 +107,6 @@
       max-width: 680px;
       line-height: 1.5;
     }
-
     @keyframes pulseTitle {
       0% {
         text-shadow: 0 0 15px rgba(255, 182, 217, 0.8), 0 0 35px rgba(255, 105, 180, 0.5);
@@ -128,14 +115,11 @@
         text-shadow: 0 0 25px rgba(255, 220, 240, 1.0), 0 0 50px rgba(255, 105, 180, 0.8), 0 0 80px rgba(255, 60, 160, 0.5);
       }
     }
-
     @keyframes shimmerText {
       0% { color: #ffb6d9; opacity: 0.7; }
       50% { color: #fff0f5; opacity: 1.0; }
       100% { color: #f9c2e0; opacity: 0.8; }
     }
-
-    /* Ambient Shooting Star Canvas */
     #fx-canvas {
       position: absolute;
       top: 0;
@@ -145,8 +129,6 @@
       pointer-events: none;
       z-index: 1;
     }
-
-    /* Loading Overlay */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -161,12 +143,10 @@
       justify-content: center;
       transition: opacity 0.8s ease;
     }
-
     .loading-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
-
     .spinner {
       width: 48px;
       height: 48px;
@@ -177,12 +157,9 @@
       margin-bottom: 18px;
       box-shadow: 0 0 20px rgba(255, 122, 182, 0.4);
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-
-    /* Subtle touch invitation on first load */
     .tap-hint {
       position: absolute;
       bottom: 30px;
@@ -198,7 +175,6 @@
       transition: opacity 2s ease;
       animation: fadeHint 3s infinite alternate;
     }
-
     @keyframes fadeHint {
       from { opacity: 0.25; }
       to { opacity: 0.7; }
@@ -206,50 +182,34 @@
   </style>
 </head>
 <body>
-
   <div class="cosmic-bg"></div>
   <canvas id="fx-canvas"></canvas>
   <canvas id="webgl-canvas"></canvas>
-
   <div class="loading-overlay" id="loading-overlay">
     <div class="spinner"></div>
     <div style="font-size: 14px; color: #ff7ab6; letter-spacing: 3px; font-family: 'Cormorant Garamond', serif;">PREPARANDO DEDICATORIA...</div>
   </div>
-
-  <!-- Pure, Elegant Dedication for Gaby -->
   <div class="header-bar">
     <div class="dedication-tag">CON TODO MI AMOR</div>
     <div class="dedication-title" id="disp-title">Para Gaby</div>
     <div class="dedication-subtitle" id="disp-subtitle">"En cada rincón del mundo y en cada idioma: te amo."</div>
   </div>
-
   <div class="tap-hint" id="tap-hint">Toca o arrastra para girar el corazón</div>
-
   <script>
-    /* =========================================================================
-       1. PARAMETERS & DEDICATION
-       ========================================================================= */
     const state = {
       to: "Para Gaby",
       msg: "En cada rincón del mundo y en cada idioma: te amo.",
       time: 0,
-      turnDuration: 10.0 // 10s per full rotation
+      turnDuration: 10.0
     };
-
     const params = new URLSearchParams(window.location.search);
     if (params.get("to")) state.to = params.get("to");
     if (params.get("msg")) state.msg = params.get("msg");
-
     document.getElementById("disp-title").textContent = state.to;
     document.getElementById("disp-subtitle").textContent = `"${state.msg}"`;
-
-    /* =========================================================================
-       2. THREE.JS ORTHOGRAPHIC SCENE SETUP (EXACT 1080x960 CANVAS)
-       ========================================================================= */
     const W = 1080;
     const H = 960;
     const canvas = document.getElementById("webgl-canvas");
-
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -259,14 +219,10 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(W, H, false);
     renderer.setClearColor(0x000000, 0.0);
-
     const scene = new THREE.Scene();
-
-    // Orthographic Camera screen coordinate system
     const camera = new THREE.OrthographicCamera(-W / 2, W / 2, H / 2, -H / 2, 1, 2000);
     camera.position.set(0, 0, 1000);
     camera.lookAt(0, 0, 0);
-
     function resizeCanvas() {
       const winW = window.innerWidth;
       const winH = window.innerHeight;
@@ -276,50 +232,34 @@
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
-
-    /* =========================================================================
-       3. LIVING SHIMMER CHROME SHADER
-       ========================================================================= */
-    // Dynamic shimmer transitions gracefully through iridescent chrome palettes
     const chromeUniforms = {
       uRotation: { value: 0 },
       uTime: { value: 0 },
       uPointSize: { value: window.devicePixelRatio > 1.5 ? 1.4 : 1.2 }
     };
-
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms: chromeUniforms,
       vertexShader: `
         attribute float alpha;
         attribute vec3 normalVec;
-
         varying vec3 vRotatedNormal;
         varying float vAlpha;
         varying float vDepth;
-
         uniform float uRotation;
         uniform float uPointSize;
-
         void main() {
           vAlpha = alpha;
-
-          // Rotate around Y axis
           float c = cos(uRotation);
           float s = sin(uRotation);
-
           vec3 pos = position;
           float rx = pos.x * c + pos.z * s;
           float rz = -pos.x * s + pos.z * c;
-
           pos.x = rx;
           pos.z = rz;
           vDepth = rz;
-
-          // Rotate normal vector
           float rnx = normalVec.x * c + normalVec.z * s;
           float rnz = -normalVec.x * s + normalVec.z * c;
           vRotatedNormal = vec3(rnx, normalVec.y, rnz);
-
           gl_Position = projectionMatrix * viewMatrix * vec4(pos, 1.0);
           gl_PointSize = uPointSize;
         }
@@ -328,83 +268,53 @@
         varying vec3 vRotatedNormal;
         varying float vAlpha;
         varying float vDepth;
-
         uniform float uTime;
-
         float smoothVal(float x) {
           x = clamp(x, 0.0, 1.0);
           return x * x * (3.0 - 2.0 * x);
         }
-
         void main() {
-          // Hide back-facing surface points
           if (vRotatedNormal.z < -0.05) {
             discard;
           }
-
-          // Chrome surface reflection formula:
           float ry = 2.0 * vRotatedNormal.z * vRotatedNormal.y;
           float rx = 2.0 * vRotatedNormal.z * vRotatedNormal.x;
-
-          // Living Shimmer: Reflection colors shift majestically over time
           float shimmer = uTime * 0.22;
           float cycleA = sin(shimmer) * 0.5 + 0.5;
           float cycleB = cos(shimmer * 0.65) * 0.5 + 0.5;
-
-          // Base Palettes:
-          // 1. Classic Rose Chrome
           vec3 skyRose = vec3(255.0/255.0, 240.0/255.0, 248.0/255.0);
           vec3 bandRose = vec3(78.0/255.0, 36.0/255.0, 70.0/255.0);
           vec3 floorRose = vec3(246.0/255.0, 168.0/255.0, 210.0/255.0);
-
-          // 2. Warm Champagne Gold
           vec3 skyGold = vec3(1.0, 0.98, 0.92);
           vec3 bandGold = vec3(0.35, 0.20, 0.12);
           vec3 floorGold = vec3(0.98, 0.76, 0.38);
-
-          // 3. Celestial Iridescent Violet
           vec3 skyViolet = vec3(0.96, 0.92, 1.0);
           vec3 bandViolet = vec3(0.24, 0.10, 0.38);
           vec3 floorViolet = vec3(0.85, 0.55, 0.98);
-
-          // Smooth interpolation for continuous shimmer
           vec3 curSky = mix(mix(skyRose, skyGold, cycleA), skyViolet, cycleB * 0.45);
           vec3 curBand = mix(mix(bandRose, bandGold, cycleA), bandViolet, cycleB * 0.45);
           vec3 curFloor = mix(mix(floorRose, floorGold, cycleA), floorViolet, cycleB * 0.45);
-
           float sky = smoothVal((ry - 0.12) / 0.3);
           float floor_val = smoothVal((-ry - 0.05) / 0.4);
-
           vec3 c = curBand * (1.0 - sky - floor_val) + curSky * sky + curFloor * floor_val;
-          
-          // Shimmering streak highlight
           float streakPulse = 0.08 + 0.015 * sin(uTime * 1.5);
           float streak = exp(-pow((rx + 0.35) / streakPulse, 2.0)) * smoothVal((ry + 0.1) / 0.3);
           vec3 col = c + streak * (0.5 + 0.15 * sin(shimmer * 1.8));
-
-          // Rim metallic edge highlight
           float rim = clamp(1.0 - abs(vRotatedNormal.z), 0.0, 1.0);
           vec3 finalColor = col * (vAlpha * (0.95 + 0.85 * rim));
-
           gl_FragColor = vec4(finalColor, 1.0);
         }
       `,
       transparent: true,
       depthTest: true
     });
-
-    /* =========================================================================
-       4. LOAD POINT CLOUD (254,074 POINTS)
-       ========================================================================= */
     let pointCloud = null;
-
     async function loadHeartPoints() {
       try {
         const res = await fetch("heart_points.bin");
         const buffer = await res.arrayBuffer();
         const dataView = new DataView(buffer);
         const N = dataView.getUint32(4, true);
-
         let offset = 8;
         const xArr = new Int16Array(buffer, offset, N); offset += N * 2;
         const yArr = new Int16Array(buffer, offset, N); offset += N * 2;
@@ -413,47 +323,34 @@
         const nyArr = new Int8Array(buffer, offset, N); offset += N;
         const nzArr = new Int8Array(buffer, offset, N); offset += N;
         const texArr = new Uint8Array(buffer, offset, N);
-
         const positions = new Float32Array(N * 3);
         const normals = new Float32Array(N * 3);
         const alphas = new Float32Array(N);
-
         for (let i = 0; i < N; i++) {
           positions[i * 3] = xArr[i];
           positions[i * 3 + 1] = yArr[i];
           positions[i * 3 + 2] = zArr[i];
-
           normals[i * 3] = nxArr[i] / 127.0;
           normals[i * 3 + 1] = nyArr[i] / 127.0;
           normals[i * 3 + 2] = nzArr[i] / 127.0;
-
           alphas[i] = texArr[i] / 255.0;
         }
-
         const geo = new THREE.BufferGeometry();
         geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
         geo.setAttribute("normalVec", new THREE.BufferAttribute(normals, 3));
         geo.setAttribute("alpha", new THREE.BufferAttribute(alphas, 1));
-
         pointCloud = new THREE.Points(geo, shaderMaterial);
         scene.add(pointCloud);
-
         document.getElementById("loading-overlay").classList.add("hidden");
       } catch (err) {
         console.error("Error loading heart_points.bin:", err);
       }
     }
     loadHeartPoints();
-
-    /* =========================================================================
-       5. CELESTIAL STARDUST & SHOOTING STARS (BACKGROUND CANVAS)
-       ========================================================================= */
     const fxCanvas = document.getElementById("fx-canvas");
     const fxCtx = fxCanvas.getContext("2d");
-
     let fxW = window.innerWidth;
     let fxH = window.innerHeight;
-
     function resizeFx() {
       fxW = window.innerWidth;
       fxH = window.innerHeight;
@@ -462,8 +359,6 @@
     }
     window.addEventListener("resize", resizeFx);
     resizeFx();
-
-    // 220 Floating Romantic Stardust Particles
     const stars = [];
     for (let i = 0; i < 220; i++) {
       stars.push({
@@ -477,10 +372,7 @@
         color: Math.random() > 0.4 ? "#ffb6d9" : (Math.random() > 0.5 ? "#fce4ec" : "#ffd1dc")
       });
     }
-
-    // Shooting Star Manager
     let shootingStar = null;
-
     function spawnShootingStar() {
       shootingStar = {
         x: Math.random() * fxW * 0.8 + fxW * 0.1,
@@ -493,18 +385,14 @@
     }
     setInterval(spawnShootingStar, 6500);
     setTimeout(spawnShootingStar, 1200);
-
     function drawFx(t) {
       fxCtx.clearRect(0, 0, fxW, fxH);
-
-      // Draw Twinkling Stardust
       for (let s of stars) {
         s.y += s.speedY;
         s.x += s.speedX;
         if (s.y < 0) { s.y = fxH; s.x = Math.random() * fxW; }
         if (s.x < 0) s.x = fxW;
         if (s.x > fxW) s.x = 0;
-
         const pulseAlpha = s.alpha * (0.6 + 0.4 * Math.sin(t * s.twinkle + s.x));
         fxCtx.beginPath();
         fxCtx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
@@ -512,24 +400,19 @@
         fxCtx.globalAlpha = Math.max(0, Math.min(1, pulseAlpha));
         fxCtx.fill();
       }
-
-      // Draw Shooting Star
       if (shootingStar) {
         shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
         shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
         shootingStar.alpha -= 0.016;
-
         if (shootingStar.alpha <= 0) {
           shootingStar = null;
         } else {
           const tailX = shootingStar.x - Math.cos(shootingStar.angle) * shootingStar.len;
           const tailY = shootingStar.y - Math.sin(shootingStar.angle) * shootingStar.len;
-
           const grad = fxCtx.createLinearGradient(shootingStar.x, shootingStar.y, tailX, tailY);
           grad.addColorStop(0, `rgba(255, 245, 250, ${shootingStar.alpha})`);
           grad.addColorStop(0.3, `rgba(255, 182, 217, ${shootingStar.alpha * 0.7})`);
           grad.addColorStop(1, 'rgba(255, 105, 180, 0)');
-
           fxCtx.beginPath();
           fxCtx.moveTo(shootingStar.x, shootingStar.y);
           fxCtx.lineTo(tailX, tailY);
@@ -540,43 +423,31 @@
       }
       fxCtx.globalAlpha = 1.0;
     }
-
-    /* =========================================================================
-       6. ETHEREAL ROMANTIC GENERATIVE AUDIO (ALWAYS AUTOPLAYING)
-       ========================================================================= */
     let audioCtx = null;
     let isMusicPlaying = false;
     let musicInterval = null;
-
     function initAudio() {
       if (audioCtx) return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-
     function playTone(freq, startTime, duration, type = "sine", maxGain = 0.08) {
       if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
-
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
-
       filter.type = "lowpass";
       filter.frequency.setValueAtTime(850, startTime);
-
       gain.gain.setValueAtTime(0, startTime);
       gain.gain.linearRampToValueAtTime(maxGain, startTime + 0.18);
       gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(audioCtx.destination);
-
       osc.start(startTime);
       osc.stop(startTime + duration);
     }
-
     function startMusic() {
       initAudio();
       if (audioCtx.state === "suspended") {
@@ -584,47 +455,33 @@
       }
       if (isMusicPlaying) return;
       isMusicPlaying = true;
-
-      // Celestial Romantic Chord Progression: Cmaj9 -> Am9 -> Fmaj7 -> Gsus4
       const chords = [
-        { bass: 130.81, notes: [261.63, 329.63, 392.00, 493.88, 587.33] }, // Cmaj9
-        { bass: 110.00, notes: [220.00, 261.63, 329.63, 392.00, 523.25] }, // Am9
-        { bass: 87.31,  notes: [174.61, 220.00, 261.63, 329.63, 440.00] }, // Fmaj7
-        { bass: 98.00,  notes: [196.00, 261.63, 293.66, 392.00, 587.33] }  // Gsus4
+        { bass: 130.81, notes: [261.63, 329.63, 392.00, 493.88, 587.33] },
+        { bass: 110.00, notes: [220.00, 261.63, 329.63, 392.00, 523.25] },
+        { bass: 87.31,  notes: [174.61, 220.00, 261.63, 329.63, 440.00] },
+        { bass: 98.00,  notes: [196.00, 261.63, 293.66, 392.00, 587.33] }
       ];
-
       let step = 0;
       function tickChord() {
         if (!isMusicPlaying) return;
         const now = audioCtx.currentTime;
         const chord = chords[step % chords.length];
-
-        // Soft warm bass pad
         playTone(chord.bass, now, 3.8, "triangle", 0.05);
-
-        // Delicate sparkling arpeggios
         chord.notes.forEach((freq, idx) => {
           const delay = idx * 0.45 + (Math.random() * 0.05);
           playTone(freq, now + delay, 3.0, "sine", 0.065);
-          // High bell sparkle octave
           if (idx % 2 === 0) {
             playTone(freq * 2, now + delay + 0.1, 1.8, "sine", 0.025);
           }
         });
-
         step++;
       }
-
       tickChord();
       musicInterval = setInterval(tickChord, 2800);
     }
-
-    // Try starting audio immediately
     window.addEventListener("load", () => {
       startMusic();
     });
-
-    // Ensure audio starts seamlessly on ANY user interaction
     function unlockAudio() {
       startMusic();
       const hint = document.getElementById("tap-hint");
@@ -633,29 +490,21 @@
     ["click", "touchstart", "touchend", "pointerdown", "keydown", "scroll", "mousemove"].forEach(evt => {
       window.addEventListener(evt, unlockAudio, { once: true, passive: true });
     });
-
-    /* =========================================================================
-       7. SMOOTH INTERACTION & DRAG
-       ========================================================================= */
     let isDragging = false;
     let prevMouseX = 0;
     let manualRotationOffset = 0;
-
     window.addEventListener("mousedown", (e) => {
       isDragging = true;
       prevMouseX = e.clientX;
       unlockAudio();
     });
-
     window.addEventListener("mousemove", (e) => {
       if (!isDragging) return;
       const dx = e.clientX - prevMouseX;
       manualRotationOffset += dx * 0.008;
       prevMouseX = e.clientX;
     });
-
     window.addEventListener("mouseup", () => { isDragging = false; });
-
     window.addEventListener("touchstart", (e) => {
       unlockAudio();
       if (e.touches.length === 1) {
@@ -663,43 +512,29 @@
         prevMouseX = e.touches[0].clientX;
       }
     }, { passive: true });
-
     window.addEventListener("touchmove", (e) => {
       if (!isDragging || e.touches.length !== 1) return;
       const dx = e.touches[0].clientX - prevMouseX;
       manualRotationOffset += dx * 0.008;
       prevMouseX = e.touches[0].clientX;
     }, { passive: true });
-
     window.addEventListener("touchend", () => { isDragging = false; });
-
-    /* =========================================================================
-       8. MAIN ANIMATION LOOP (LIVING HEARTBEAT & 60 FPS)
-       ========================================================================= */
     const clock = new THREE.Clock();
-
     function animate() {
       requestAnimationFrame(animate);
-
       const delta = clock.getDelta();
       state.time += delta;
-
-      // 10s per full rotation around vertical Y axis
       const autoAngle = (state.time / state.turnDuration) * Math.PI * 2;
       chromeUniforms.uRotation.value = autoAngle + manualRotationOffset;
       chromeUniforms.uTime.value = state.time;
-
-      // Organic gentle heartbeat pulse
       if (pointCloud) {
         const pulse = 1.0 + Math.sin(state.time * 3.14) * 0.015 + Math.sin(state.time * 6.28) * 0.008;
         pointCloud.scale.set(pulse, pulse, pulse);
       }
-
       drawFx(state.time);
       renderer.render(scene, camera);
     }
     animate();
-
     setTimeout(() => {
       const hint = document.getElementById("tap-hint");
       if (hint) hint.style.opacity = "0";
